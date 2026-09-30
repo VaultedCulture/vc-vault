@@ -1,0 +1,10 @@
+from pathlib import Path
+p=Path('outputs/tcg-vault/public/app.js')
+s=p.read_text(encoding='utf-8')
+s=s.replace("<div class=\"card-bottom\"><small>${p===null?", "${S.tracked[c.set.id]?.mode==='variants'?`<div class=\"variant-status\">${variants(c).map(v=>`<span class=\"${qty(c.id,v)?'have':'need'}\">${qty(c.id,v)?'✓':'○'} ${names[v]}</span>`).join('')}</div>`:''}<div class=\"card-bottom\"><small>${p===null?")
+s=s.replace("all=activeSet.cards;", "all=activeSet.cards;")
+s=s.replace("<button data-action=\"select-visible\">Select displayed cards</button>","<div>${view==='browse'?'<button data-action=\"export-missing\">↓ Missing list</button> ':''}<button data-action=\"select-visible\">Select displayed cards</button></div>")
+s=s.replace("case 'explore':explore();break;", "case 'export-missing':exportMissing();break;case 'explore':explore();break;")
+s=s.replace("function selection(){", "function exportMissing(){const s=activeSet, mode=S.tracked[s.id]?.mode||'unique';const rows=[['Set','Number','Card','Missing print']];for(const c of s.cards){if(mode==='variants'){for(const v of variants(c))if(!qty(c.id,v))rows.push([s.name,c.localId,c.name,names[v]]);}else if(!qty(c.id))rows.push([s.name,c.localId,c.name,'Any print']);}const csv=rows.map(r=>r.map(x=>'\"'+String(x).replaceAll('\"','\"\"')+'\"').join(',')).join('\\r\\n');const u=URL.createObjectURL(new Blob(['\\ufeff'+csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=s.id+'-missing.csv';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);notify((rows.length-1)+' missing entries exported.');}\nfunction selection(){")
+p.write_text(s,encoding='utf-8')
+p=Path('outputs/tcg-vault/public/style.css');s=p.read_text(encoding='utf-8');s+='\n.variant-status{display:flex;flex-wrap:wrap;gap:4px;margin:-4px 0 10px;font-size:9px}.variant-status span{padding:2px 5px;border-radius:4px;background:#232a22}.variant-status .have{color:var(--lime)}.variant-status .need{color:#c2b7a4}\n';p.write_text(s,encoding='utf-8')
